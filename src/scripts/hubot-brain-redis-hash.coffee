@@ -1,27 +1,81 @@
-###
-
-hubot-bucket
-https://github.com/halkeye/hubot-bucket
-
-Copyright (c) 2013 Gavin
-Licensed under the MIT license.
-
-###
+# Description:
+#   None
+#
+# Dependencies:
+#   "redis": "0.7.2"
+#
+# Configuration:
+#   REDISTOGO_URL
+#
+# Commands:
+#   None
+#
+# Author:
+#   Gavin Mogan <gavin@kodekoan.com>
 
 'use strict'
-monkey = require 'monkey-patch'
+
+Url   = require "url"
+Redis = require "redis"
+
+# sets up hooks to persist the brain into redis.
 module.exports = (robot) ->
-  robot.adapter._oldsend = robot.adapter.send
-  robot.adapter.send = (envelope, strings...) ->
-    for i in [0...strings.length]
-      strings[i] = strings[i].replace('$blah', 'whatever')
+  info   = Url.parse process.env.REDISTOGO_URL || process.env.BOXEN_REDIS_URL || 'redis://localhost:6379'
+  client = Redis.createClient(info.port, info.hostname)
+  oldkeys = {}
 
-    @_oldsend envelope, strings
+  if info.auth
+    client.auth info.auth.split(":")[1]
 
-  robot.hear /^(.*)/, (msg) ->
-    msg.reply(msg.match[0])
+  client.on "error", (err) ->
+    robot.logger.error err
 
-  robot.enter (response) ->
-    # track enter
-  robot.leave (response) ->
-    # track leave
+  client.on "connect", ->
+    robot.logger.debug "Successfully connected to Redis"
+
+    client.hgetall "hubot:brain", (err, reply) ->
+      if err
+        throw err
+      else if reply
+        robot.logger.info "Brain data retrieved from redis-brain storage"
+        results = {}
+        oldkeys = {}
+        for key in reply
+          results[key] = JSON.parse(reply[key].toString())
+          oldkeys[key] = 1
+        robot.brain.mergeData results
+      else
+        robot.logger.info "Initializing new redis-brain storage"
+        robot.brain.mergeData {}
+
+      robot.logger.info "Enabling brain auto-saving"
+      if robot.brain.setAutoSave?
+        robot.brain.setAutoSave true
+
+  # Prevent autosaves until connect has occured
+  robot.logger.info "Disabling brain auto-saving"
+  if robot.brain.setAutoSave?
+    robot.brain.setAutoSave false
+
+  robot.brain.on 'save', (data = {}) ->
+    robot.logger.debug "Saving brain data"
+    multi = client.multi
+    keys = Object.keys data
+    jsonified = {}
+    for key in keys
+      jsonified = JSON.stringify data[key]
+    for key in oldkeys
+      if !jsonified[key]
+        multi=multi.hdel "hubot:brain", key
+
+    oldkeys = {}
+    for key in keys
+      oldkeys[key] = 1
+      multi=multi.hset "hubot:brain", jsonified[key]
+
+    console.log multi
+    multi.exec (err,replies) ->
+      @
+
+  robot.brain.on 'close', ->
+    client.quit()
