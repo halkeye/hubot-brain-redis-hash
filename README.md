@@ -8,7 +8,9 @@ Hubot brain that uses hset and hget instead of storing everything as one giant b
 3. Profit
 
 ## Configuration (optional)
+```
 export REDISTOGO_URL="redis://localhost:6379"
+```
 
 ## Release History
 
