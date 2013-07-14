@@ -59,21 +59,21 @@ module.exports = (robot) ->
 
   robot.brain.on 'save', (data = {}) ->
     robot.logger.debug "Saving brain data"
-    multi = client.multi
+    multi = do client.multi
     keys = Object.keys data
     jsonified = {}
     for key in keys
-      jsonified = JSON.stringify data[key]
+      jsonified[key] = JSON.stringify data[key]
     for key in oldkeys
       if !jsonified[key]
-        multi=multi.hdel "hubot:brain", key
+        multi.hdel "hubot:brain", key
 
     oldkeys = {}
     for key in keys
-      oldkeys[key] = 1
-      multi=multi.hset "hubot:brain", jsonified[key]
+      if jsonified[key]?
+        oldkeys[key] = 1
+        multi.hset "hubot:brain", key, jsonified[key]
 
-    console.log multi
     multi.exec (err,replies) ->
       @
 
