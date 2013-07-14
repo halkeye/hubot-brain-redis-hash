@@ -1,6 +1,6 @@
 'use strict'
 
-hubot_bucket = require('../lib/hubot-bucket.js')
+hubot_bucket = require('../lib/hubot-brain-redis-hash.js')
 
 ###
 ======== A Handy Little Mocha Reference ========
