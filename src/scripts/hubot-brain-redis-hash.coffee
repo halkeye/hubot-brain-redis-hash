@@ -40,7 +40,7 @@ module.exports = (robot) ->
         robot.logger.info "Brain data retrieved from redis-brain storage"
         results = {}
         oldkeys = {}
-        for key in reply
+        for key in Object.keys(reply)
           results[key] = JSON.parse(reply[key].toString())
           oldkeys[key] = 1
         robot.brain.mergeData results

@@ -50,7 +50,7 @@ module.exports = (grunt)->
     simplemocha:
       all:
         src: [
-          'node_modules/should/scripts/should.js'
+          'node_modules/should/src/should.js'
           'out/test/**/*.js'
         ]
         options:
