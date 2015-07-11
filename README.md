@@ -17,7 +17,3 @@ export REDISTOGO_URL="redis://localhost:6379"
 ## License
 Copyright (c) 2013 Gavin Mogan
 Licensed under the MIT license.
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/halkeye/hubot-brain-redis-hash/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
