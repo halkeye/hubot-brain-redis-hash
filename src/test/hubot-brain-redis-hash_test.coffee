@@ -1,60 +1,56 @@
 'use strict'
 
-hubot_bucket = require('../lib/hubot-brain-redis-hash.js')
+process.env.HUBOT_LOG_LEVEL="alert"
+process.env.EXPRESS_PORT = process.env.PORT = 0
+Hubot = require('hubot')
+Path = require('path')
+Url = require 'url'
+should = require('should')
+fakeredis = require('fakeredis')
 
-###
-======== A Handy Little Mocha Reference ========
-https://github.com/visionmedia/should.js
-https://github.com/visionmedia/mocha
+adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
+{TextMessage} = require Path.join(adapterPath,'../message')
 
-Mocha hooks:
-  before ()-> # before describe
-  after ()-> # after describe
-  beforeEach ()-> # before each it
-  afterEach ()-> # after each it
+hubot_brain_redis_hash = require('../scripts/hubot-brain-redis-hash')
+hubot_brain_redis_hash.createClient = () =>
+  return fakeredis.createClient("","", {
+    fast: true
+  })
 
-Should assertions:
-  should.exist('hello')
-  should.fail('expected an error!')
-  true.should.be.ok
-  true.should.be.true
-  false.should.be.false
+describe 'Hubot-Brain-Redis-Hash', ()->
+  beforeEach ->
+    @robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
+    hubot_brain_redis_hash(@robot)
+    @client = @robot.brain.redis_hash.client
+    @client.emit('connect')
 
-  (()-> arguments)(1,2,3).should.be.arguments
-  [1,2,3].should.eql([1,2,3])
-  should.strictEqual(undefined, value)
-  user.age.should.be.within(5, 50)
-  username.should.match(/^\w+$/)
+  it 'handleError', ()->
+    @client.emit('error', 'this is my fake error')
+    #hubot_brain_redis_hash.awesome().should.eql('awesome')
 
-  user.should.be.a('object')
-  [].should.be.an.instanceOf(Array)
+  it 'handleConnect', (done)->
 
-  user.should.have.property('age', 15)
+    orig_data = { users: {}, _private: {} }
+    @robot.brain.data.should.eql(orig_data)
+    orig_data.thisisgavin = { a: "byebye" }
 
-  user.age.should.be.above(5)
-  user.age.should.be.below(100)
-  user.pets.should.have.length(5)
+    multi = do @client.multi
+    for key, value of orig_data
+      multi.hset "hubot:brain", key, JSON.stringify(orig_data[key])
 
-  res.should.have.status(200) #res.statusCode should be 200
-  res.should.be.json
-  res.should.be.html
-  res.should.have.header('Content-Length', '123')
+    multi.exec (err, replies) =>
+      @robot.brain.on 'loaded', (data) =>
+        data.should.eql(orig_data)
+        done()
+      @client.emit('connect')
 
-  [].should.be.empty
-  [1,2,3].should.include(3)
-  'foo bar baz'.should.include('foo')
-  { name: 'TJ', pet: tobi }.user.should.include({ pet: tobi, name: 'TJ' })
-  { foo: 'bar', baz: 'raz' }.should.have.keys('foo', 'bar')
-
-  (()-> throw new Error('failed to baz')).should.throwError(/^fail.+/)
-
-  user.should.have.property('pets').with.lengthOf(4)
-  user.should.be.a('object').and.have.property('name', 'tj')
-###
-
-describe 'Awesome', ()->
-  describe '#of()', ()->
-
-    it 'awesome', ()->
-      hubot_bucket.awesome().should.eql('awesome')
+  it 'handleSave', (done)->
+    @robot.brain.data.should.eql({ users: {}, _private: {} })
+    @robot.brain.data.gavin = "gavin"
+    @robot.brain.data.gavin.should.eql("gavin")
+    @robot.brain.save()
+    @robot.brain.on 'done:save', () =>
+      @client.hgetall "hubot:brain", (err, reply) =>
+        reply.gavin.should.eql('"gavin"')
+        done(err)
 

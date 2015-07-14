@@ -11,7 +11,7 @@
 #   None
 #
 # Author:
-#   Gavin Mogan <gavin@kodekoan.com>
+#   Gavin Mogan <gavin@gavinmogan.com>
 
 'use strict'
 
@@ -20,13 +20,10 @@ Redis = require "redis"
 
 # sets up hooks to persist the brain into redis.
 module.exports = (robot) ->
-  info   = Url.parse process.env.REDISTOGO_URL || process.env.BOXEN_REDIS_URL || 'redis://localhost:6379'
-  client = Redis.createClient(info.port, info.hostname)
+  robot.brain.redis_hash = {}
+  client = robot.brain.redis_hash.client = module.exports.createClient()
+
   oldkeys = {}
-
-  if info.auth
-    client.auth info.auth.split(":")[1]
-
   client.on "error", (err) ->
     robot.logger.error err
 
@@ -75,7 +72,18 @@ module.exports = (robot) ->
         multi.hset "hubot:brain", key, jsonified[key]
 
     multi.exec (err,replies) ->
+      robot.brain.emit 'done:save'
       @
 
   robot.brain.on 'close', ->
     client.quit()
+
+  @
+
+module.exports.createClient = () ->
+  info   = Url.parse process.env.REDISTOGO_URL || process.env.BOXEN_REDIS_URL || 'redis://localhost:6379'
+  client = Redis.createClient(info.port, info.hostname)
+
+  if info.auth
+    client.auth info.auth.split(":")[1]
+  return client
