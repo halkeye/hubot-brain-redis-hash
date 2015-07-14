@@ -2,31 +2,37 @@
 
 process.env.HUBOT_LOG_LEVEL="alert"
 process.env.EXPRESS_PORT = process.env.PORT = 0
+
 Hubot = require('hubot')
 Path = require('path')
 Url = require 'url'
 should = require('should')
+sinon = require('sinon')
 fakeredis = require('fakeredis')
 
 adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
 {TextMessage} = require Path.join(adapterPath,'../message')
 
 hubot_brain_redis_hash = require('../scripts/hubot-brain-redis-hash')
-hubot_brain_redis_hash.createClient = () =>
-  return fakeredis.createClient("","", {
-    fast: true
-  })
 
 describe 'Hubot-Brain-Redis-Hash', ()->
+  before ->
+    sinon.stub(hubot_brain_redis_hash, 'createClient', fakeredis.createClient)
+
   beforeEach ->
     @robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
     hubot_brain_redis_hash(@robot)
     @client = @robot.brain.redis_hash.client
-    @client.emit('connect')
+
+  after ->
+    hubot_brain_redis_hash.createClient.restore()
+
+  afterEach (done)->
+    @client.flushdb ->
+      done()
 
   it 'handleError', ()->
     @client.emit('error', 'this is my fake error')
-    #hubot_brain_redis_hash.awesome().should.eql('awesome')
 
   it 'handleConnect', (done)->
 
