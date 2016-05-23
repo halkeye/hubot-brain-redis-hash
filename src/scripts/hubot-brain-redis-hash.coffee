@@ -6,6 +6,7 @@
 #
 # Configuration:
 #   REDISTOGO_URL
+#   REDIS_PREFIX - If not provided will default to 'hubot'.
 #
 # Commands:
 #   None
@@ -22,6 +23,7 @@ Redis = require "redis"
 module.exports = (robot) ->
   robot.brain.redis_hash = {}
   client = robot.brain.redis_hash.client = module.exports.createClient()
+  prefix = process.env.REDIS_PREFIX or 'hubot'
 
   oldkeys = {}
   client.on "error", (err) ->
@@ -30,7 +32,7 @@ module.exports = (robot) ->
   client.on "connect", ->
     robot.logger.debug "Successfully connected to Redis"
 
-    client.hgetall "hubot:brain", (err, reply) ->
+    client.hgetall "#{prefix}:brain", (err, reply) ->
       if err
         throw err
       else if reply
@@ -63,13 +65,13 @@ module.exports = (robot) ->
       jsonified[key] = JSON.stringify data[key]
     for key in oldkeys
       if !jsonified[key]
-        multi.hdel "hubot:brain", key
+        multi.hdel "#{prefix}:brain", key
 
     oldkeys = {}
     for key in keys
       if jsonified[key]?
         oldkeys[key] = 1
-        multi.hset "hubot:brain", key, jsonified[key]
+        multi.hset "#{prefix}:brain", key, jsonified[key]
 
     multi.exec (err,replies) ->
       robot.brain.emit 'done:save'
