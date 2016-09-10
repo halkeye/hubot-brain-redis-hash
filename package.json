@@ -1,7 +1,7 @@
 {
   "name": "hubot-brain-redis-hash",
   "description": "Hubot brain that uses hset and hget instead of storing everything as one giant blob",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/halkeye/hubot-brain-redis-hash",
   "author": {
     "name": "Gavin Mogan",
