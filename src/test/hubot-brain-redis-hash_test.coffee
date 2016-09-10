@@ -45,7 +45,7 @@ describe 'Hubot-Brain-Redis-Hash', ()->
       multi.hset "hubot:brain", key, JSON.stringify(orig_data[key])
 
     multi.exec (err, replies) =>
-      @robot.brain.on 'loaded', (data) =>
+      @robot.brain.on 'loaded', (data) ->
         data.should.eql(orig_data)
         done()
       @client.emit('connect')
@@ -56,7 +56,7 @@ describe 'Hubot-Brain-Redis-Hash', ()->
     @robot.brain.data.gavin.should.eql("gavin")
     @robot.brain.save()
     @robot.brain.on 'done:save', () =>
-      @client.hgetall "hubot:brain", (err, reply) =>
+      @client.hgetall "hubot:brain", (err, reply) ->
         reply.gavin.should.eql('"gavin"')
         done(err)
 

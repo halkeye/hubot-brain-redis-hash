@@ -75,7 +75,7 @@ module.exports = (robot) ->
 
     multi.exec (err,replies) ->
       robot.brain.emit 'done:save'
-      @
+      return
 
   robot.brain.on 'close', ->
     client.quit()
