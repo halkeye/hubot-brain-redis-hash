@@ -23,7 +23,7 @@
   ],
   "main": "src/scripts/hubot-brain-redis-hash",
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 4"
   },
   "scripts": {
     "test": "grunt simplemocha"
