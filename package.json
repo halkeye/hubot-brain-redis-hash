@@ -44,6 +44,6 @@
     "hubot-scripts"
   ],
   "dependencies": {
-    "redis": "~2.7.1"
+    "redis": "~2.8.0"
   }
 }
