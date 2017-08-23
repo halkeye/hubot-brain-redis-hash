@@ -83,7 +83,7 @@ module.exports = (robot) ->
   @
 
 module.exports.createClient = () ->
-  info   = Url.parse process.env.REDISTOGO_URL || process.env.BOXEN_REDIS_URL || 'redis://localhost:6379'
+  info   = Url.parse process.env.REDISTOGO_URL || process.env.BOXEN_REDIS_URL || process.env.REDISCLOUD_URL || 'redis://localhost:6379'
   client = Redis.createClient(info.port, info.hostname)
 
   if info.auth
