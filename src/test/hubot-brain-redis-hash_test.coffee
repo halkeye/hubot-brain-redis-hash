@@ -17,7 +17,7 @@ hubot_brain_redis_hash = require('../scripts/hubot-brain-redis-hash')
 
 describe 'Hubot-Brain-Redis-Hash', ()->
   before ->
-    sinon.stub(hubot_brain_redis_hash, 'createClient', fakeredis.createClient)
+    sinon.stub(hubot_brain_redis_hash, 'createClient').callsFake(fakeredis.createClient)
 
   beforeEach ->
     @robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
