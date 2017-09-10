@@ -21,6 +21,11 @@ export REDISTOGO_URL="redis://localhost:6379"
 
 * Added REDIS_PREFIX env config - Thanks @erikzaadi
 
+0.2.0 - 2017-09-09
+
+* Updates to most libraries/deps
+* Added REDISCLOUD_URL env config - Thanks @actionshrimp - #18
+
 ## License
 Copyright (c) 2013 Gavin Mogan
 Licensed under the MIT license.
