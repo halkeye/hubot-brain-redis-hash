@@ -2,8 +2,5 @@ language: node_js
 node_js:
   - node
   - 6
-install:
-  - 'npm install -g npm'
-  - 'npm install'
 before_script:
   - 'npm install -g grunt-cli'
