@@ -35,7 +35,7 @@
     "grunt-contrib-clean": "~1.1.0",
     "grunt-contrib-watch": "~1.1.0",
     "grunt-simple-mocha": "~0.4.0",
-    "hubot": "^2.13.2",
+    "hubot": "^3.1.0",
     "should": "~13.2.0",
     "sinon": "^6.0.0"
   },
