@@ -1,8 +1,5 @@
 # hubot-brain-redis-hash
 
-[![Build Status](https://travis-ci.org/halkeye/hubot-brain-redis-hash.svg?branch=master)](https://travis-ci.org/halkeye/hubot-brain-redis-hash)
-[![NPM](https://nodei.co/npm/hubot-brain-redis-hash.png)](https://nodei.co/npm/hubot-brain-redis-hash/) [![Greenkeeper badge](https://badges.greenkeeper.io/halkeye/hubot-brain-redis-hash.svg)](https://greenkeeper.io/)
-
 Hubot brain that uses hset and hget instead of storing everything as one giant blob
 
 ## Getting Started

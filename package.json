@@ -45,5 +45,8 @@
   ],
   "peerDependencies": {
     "redis": "~2.8"
+  },
+  "dependencies": {
+    "coffeescript": "^2.5.1"
   }
 }
