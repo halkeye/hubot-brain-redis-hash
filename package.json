@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "fakeredis": "^2.0.0",
-    "grunt": "~1.2.0",
+    "grunt": "~1.3.0",
     "grunt-coffeelint": "~0.0.6",
     "grunt-contrib-clean": "~2.0.0",
     "grunt-contrib-watch": "~1.1.0",
