@@ -40,7 +40,7 @@
     "hubot",
     "hubot-scripts"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "redis": "~3.0"
   },
   "mocha": {
