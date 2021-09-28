@@ -1,3 +1,5 @@
+# Migrated to https://github.com/halkeye/hubot-plugins/tree/master/packages/hubot-brain-redis-hash
+
 # hubot-brain-redis-hash
 
 Hubot brain that uses hset and hget instead of storing everything as one giant blob
